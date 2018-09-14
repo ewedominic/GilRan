@@ -18,6 +18,8 @@ Environment:
 #include <dontuse.h>
 #include <suppress.h>
 
+#include "PreCreate.h"
+
 #pragma prefast(disable:__WARNING_ENCODE_MEMBER_FUNCTION_POINTER, "Not valid for kernel mode drivers")
 
 PFLT_FILTER gFilterHandle;
@@ -57,6 +59,11 @@ EXTERN_C_END
 //
 
 CONST FLT_OPERATION_REGISTRATION Callbacks[] = {
+    { IRP_MJ_CREATE,
+      0,
+      PreCreate,
+      NULL },
+
     { IRP_MJ_OPERATION_END }
 };
 

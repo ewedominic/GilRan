@@ -4,7 +4,7 @@
 
 [Version]
 Signature   = "$Windows NT$"
-Class       = "AntiVirus"								;This is determined by the work this filter driver does
+Class       = "AntiVirus"                               ;This is determined by the work this filter driver does
 ClassGuid   = {b1d1a169-c54f-4379-81db-bee7d88d7454}    ;This value is determined by the Load Order Group value
 Provider    = %ManufacturerName%
 DriverVer   = 
@@ -45,7 +45,8 @@ Description      = %ServiceDescription%
 ServiceBinary    = %12%\%DriverName%.sys        ;%windir%\system32\drivers\
 Dependencies     = "FltMgr"
 ServiceType      = 2                            ;SERVICE_FILE_SYSTEM_DRIVER
-StartType        = 2                            ;SERVICE_AUTO_START
+StartType        = 3
+;StartType        = 2                            ;SERVICE_AUTO_START
 ErrorControl     = 1                            ;SERVICE_ERROR_NORMAL
 LoadOrderGroup   = "FSFilter Anti-Virus"
 AddReg           = MiniFilter.AddRegistry
