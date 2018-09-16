@@ -1,10 +1,12 @@
 #pragma once
-NTSTATUS GetFilePath(
+NTSTATUS
+GetFilePath(
     _In_ PFLT_CALLBACK_DATA Data,
     _Out_ PWCHAR pFilePath
 );
 
-NTSTATUS GetVolumeName(
+NTSTATUS
+GetVolumeName(
     _In_ PCFLT_RELATED_OBJECTS FltObjects,
     _Out_ PWCHAR pVolumeName
 );

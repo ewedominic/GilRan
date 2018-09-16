@@ -18,11 +18,12 @@ Environment:
 #include <dontuse.h>
 #include <suppress.h>
 
+#include "../Common/Common.h"
 #include "PreCreate.h"
+#include "Port.h"
 
 #pragma prefast(disable:__WARNING_ENCODE_MEMBER_FUNCTION_POINTER, "Not valid for kernel mode drivers")
 
-PFLT_FILTER gFilterHandle;
 ULONG_PTR OperationStatusCtx = 1;
 
 /*************************************************************************
@@ -133,23 +134,47 @@ Return Value:
 
     status = FltRegisterFilter( DriverObject,
                                 &FilterRegistration,
-                                &gFilterHandle );
+                                &PortInformation.Filter );
 
     FLT_ASSERT( NT_SUCCESS( status ) );
 
-    if (NT_SUCCESS( status )) {
+    if (!NT_SUCCESS(status)) return status;
 
-        //
-        //  Start filtering i/o
-        //
+    UNICODE_STRING PortName;
+    RtlInitUnicodeString(&PortName, PORT_NAME);
 
-        status = FltStartFiltering( gFilterHandle );
+    PSECURITY_DESCRIPTOR pSecurityDescriptor;
+    status = FltBuildDefaultSecurityDescriptor(&pSecurityDescriptor, FLT_PORT_ALL_ACCESS);
+    if (NT_SUCCESS(status)) {
+        OBJECT_ATTRIBUTES ObjectAttributes;
+        InitializeObjectAttributes(
+            &ObjectAttributes,
+            &PortName,
+            OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE,
+            NULL,
+            pSecurityDescriptor
+        );
 
-        if (!NT_SUCCESS( status )) {
+        status = FltCreateCommunicationPort(
+            PortInformation.Filter,
+            &PortInformation.ServerPort,
+            &ObjectAttributes,
+            NULL,
+            ClientConnect,
+            ClientDisConnect,
+            NULL,
+            1
+        );
+        FltFreeSecurityDescriptor(pSecurityDescriptor);
 
-            FltUnregisterFilter( gFilterHandle );
+        if (NT_SUCCESS(status)) {
+            status = FltStartFiltering(PortInformation.Filter);
+
+            if (NT_SUCCESS(status)) return STATUS_SUCCESS;
         }
+        FltCloseCommunicationPort(PortInformation.ServerPort);
     }
+    FltUnregisterFilter(PortInformation.Filter);
 
     return status;
 }
@@ -181,7 +206,8 @@ Return Value:
 
     PAGED_CODE();
 
-    FltUnregisterFilter( gFilterHandle );
+    FltCloseCommunicationPort(PortInformation.ServerPort);
+    FltUnregisterFilter( PortInformation.Filter );
 
     return STATUS_SUCCESS;
 }

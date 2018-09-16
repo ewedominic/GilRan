@@ -4,7 +4,8 @@
 #include <ntstrsafe.h>
 #include "Utils.h"
 
-NTSTATUS GetFilePath(
+NTSTATUS
+GetFilePath (
     _In_ PFLT_CALLBACK_DATA Data,
     _Out_ PWCHAR pFilePath
 )
@@ -23,7 +24,8 @@ NTSTATUS GetFilePath(
     return STATUS_SUCCESS;
 }
 
-NTSTATUS GetVolumeName(
+NTSTATUS
+GetVolumeName(
     _In_ PCFLT_RELATED_OBJECTS FltObjects,
     _Out_ PWCHAR pVolumeName
 )

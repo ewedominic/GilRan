@@ -3,7 +3,9 @@
 #include <suppress.h>
 #include <ntstrsafe.h>
 
+#include "../Common/Common.h"
 #include "PreCreate.h"
+#include "Port.h"
 #include "Utils.h"
 
 FLT_PREOP_CALLBACK_STATUS
@@ -17,15 +19,26 @@ PreCreate(
 
     NTSTATUS status;
 
-    WCHAR FilePath[1024], VolumeName[1024];
+    PORT_REQUEST PortRequest;
 
-    status = GetFilePath(Data, FilePath);
-    if (!NT_SUCCESS(status)) return FLT_PREOP_COMPLETE;
+    status = GetFilePath(Data, PortRequest.FilePath);
+    if (!NT_SUCCESS(status)) return FLT_PREOP_SUCCESS_NO_CALLBACK;
 
-    status = GetVolumeName(FltObjects, VolumeName);
-    if (!NT_SUCCESS(status)) return FLT_PREOP_COMPLETE;
+    status = GetVolumeName(FltObjects, PortRequest.VolumeName);
+    if (!NT_SUCCESS(status)) return FLT_PREOP_SUCCESS_NO_CALLBACK;
 
-    DbgPrintEx(DPFLTR_DEFAULT_ID, DPFLTR_INFO_LEVEL, "FilePath: %ws%ws\n", VolumeName, FilePath);
+    PortRequest.ProcessID = PsGetCurrentProcessId();
 
+    BOOLEAN Access;
+    status = PortSendMessage(&PortRequest, &Access);
+
+    if (NT_SUCCESS(status) && !Access) {
+        FltCancelFileOpen(FltObjects->Instance, FltObjects->FileObject);
+
+        Data->IoStatus.Status = STATUS_ACCESS_DENIED;
+        Data->IoStatus.Information = 0;
+
+        return FLT_PREOP_COMPLETE;
+    }
     return FLT_PREOP_SUCCESS_NO_CALLBACK;
 }

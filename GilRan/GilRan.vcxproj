@@ -35,6 +35,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Port.c" />
     <ClCompile Include="PreCreate.c" />
     <ClCompile Include="Utils.c" />
     <ResourceCompile Include="GilRan.rc" />
@@ -193,6 +194,8 @@
     <FilesToPackage Include="$(TargetPath)" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Common\Common.h" />
+    <ClInclude Include="Port.h" />
     <ClInclude Include="PreCreate.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>
