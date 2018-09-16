@@ -36,6 +36,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PreCreate.c" />
+    <ClCompile Include="Utils.c" />
     <ResourceCompile Include="GilRan.rc" />
     <ClCompile Include="GilRan.c" />
     <Inf Include="GilRan.inf" />
@@ -193,6 +194,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PreCreate.h" />
+    <ClInclude Include="Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
