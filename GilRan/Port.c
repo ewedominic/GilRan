@@ -48,21 +48,22 @@ PortSendMessage(
 )
 {
     ULONG szResponse = sizeof(FILTER_REPLY_HEADER) + sizeof(PORT_RESPONSE);
-    PPORT_RESPONSE PortResponse = ExAllocatePoolWithTag(NonPagedPool, szResponse, 'vLIG');
+    //PPORT_RESPONSE pPortResponse = ExAllocatePoolWithTag(NonPagedPool, szResponse, 'vLIG');
 
-    if (PortResponse == NULL) return STATUS_UNSUCCESSFUL;
+    //if (pPortResponse == NULL) return STATUS_UNSUCCESSFUL;
 
     NTSTATUS status = FltSendMessage(
         PortInformation.Filter,
         &PortInformation.ClientPort,
         pPortRequest,
         sizeof(PORT_REQUEST),
-        &PortResponse,
+        pPortRequest,
         &szResponse,
         NULL
     );
-    *Access = PortResponse->Access;
+    *Access = ((PORT_RESPONSE *)pPortRequest)->Access;
+    //*Access = pPortResponse->Access;
     
-    ExFreePoolWithTag(PortResponse, 'vLIG');
+    //ExFreePoolWithTag(pPortResponse, 'vLIG');
     return status;
 }
