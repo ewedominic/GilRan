@@ -47,23 +47,22 @@ PortSendMessage(
     _Out_ PBOOLEAN Access
 )
 {
-    ULONG SizeOfResponse = sizeof(FILTER_REPLY_HEADER) + sizeof(PORT_RESPONSE);
-    //PPORT_RESPONSE pPortResponse = ExAllocatePoolWithTag(NonPagedPool, SizeOfResponse, 'vLIG');
+    ULONG SizeOfResponse = sizeof(PORT_RESPONSE);
+    PPORT_RESPONSE pPortResponse = ExAllocatePoolWithTag(NonPagedPool, SizeOfResponse, 'vLIG');
 
-    //if (pPortResponse == NULL) return STATUS_UNSUCCESSFUL;
+    if (pPortResponse == NULL) return STATUS_UNSUCCESSFUL;
 
     NTSTATUS status = FltSendMessage(
         PortInformation.Filter,
         &PortInformation.ClientPort,
         pPortRequest,
         sizeof(PORT_REQUEST),
-        pPortRequest,
+        pPortResponse,
         &SizeOfResponse,
         NULL
     );
-    *Access = ((PORT_RESPONSE *)pPortRequest)->Access;
-    //*Access = pPortResponse->Access;
+    *Access = pPortResponse->Access;
     
-    //ExFreePoolWithTag(pPortResponse, 'vLIG');
+    ExFreePoolWithTag(pPortResponse, 'vLIG');
     return status;
 }

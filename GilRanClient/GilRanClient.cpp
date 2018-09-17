@@ -22,11 +22,6 @@ typedef struct _FILTER_MESSAGE {
     OVERLAPPED Overlapped;
 } FILTER_MESSAGE, *PFILTER_MESSAGE;
 
-typedef struct _CLIENT_MESSAGE {
-    FILTER_REPLY_HEADER Header;
-    PORT_RESPONSE Response;
-} CLIENT_MESSAGE, *PCLIENT_MESSAGE;
-
 DWORD ClientWorker(
     _In_ PTHREAD_CONTEXT pThreadContext
 ) {
@@ -56,15 +51,15 @@ DWORD ClientWorker(
 
         printf("\n\n------------------------------ \nPID: %p\nVolumeName: %ws\nFileName: %ws\n", pFilterMessage->Request.ProcessID, pFilterMessage->Request.VolumeName, pFilterMessage->Request.FilePath);
 
-        CLIENT_MESSAGE ClientMessage;
-        ClientMessage.Header.Status = 0;
-        ClientMessage.Header.MessageId = pFilterMessage->Header.MessageId;
-        ClientMessage.Response.Access = TRUE;
+        PORT_RESPONSE Response;
+        Response.Header.Status = 0;
+        Response.Header.MessageId = pFilterMessage->Header.MessageId;
+        Response.Access = TRUE;
 
         hResult = FilterReplyMessage(
             pThreadContext->hCommunicationPort,
-            (PFILTER_REPLY_HEADER)&ClientMessage.Header,
-            sizeof(FILTER_REPLY_HEADER) + sizeof(PORT_RESPONSE)
+            (PFILTER_REPLY_HEADER)&Response,
+            sizeof(PORT_RESPONSE)
         );
 
         if (!SUCCEEDED(hResult)) break;

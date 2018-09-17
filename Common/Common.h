@@ -10,5 +10,6 @@ typedef struct _PORT_REQUEST {
 } PORT_REQUEST, *PPORT_REQUEST;
 
 typedef struct _PORT_RESPONSE {
+    FILTER_REPLY_HEADER Header;
     BOOLEAN Access;
 } PORT_RESPONSE, *PPORT_RESPONSE;
