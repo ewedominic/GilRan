@@ -36,17 +36,17 @@ GetVolumeName(
     VolumeName.Length = 0;
     VolumeName.MaximumLength = FltObjects->FileObject->FileName.MaximumLength + 2;
 
-    ULONG szBufferNeeded;
-    status = FltGetVolumeName(FltObjects->Volume, NULL, &szBufferNeeded);
+    ULONG BufferSizeNeeded;
+    status = FltGetVolumeName(FltObjects->Volume, NULL, &BufferSizeNeeded);
 
     if (status == STATUS_BUFFER_TOO_SMALL) {
-        VolumeName.MaximumLength += (USHORT)szBufferNeeded;
+        VolumeName.MaximumLength += (USHORT)BufferSizeNeeded;
     }
 
     VolumeName.Buffer = ExAllocatePoolWithTag(NonPagedPool, VolumeName.MaximumLength, 'vLIG');
     if (VolumeName.Buffer == NULL) return STATUS_UNSUCCESSFUL;
 
-    status = FltGetVolumeName(FltObjects->Volume, &VolumeName, &szBufferNeeded);
+    status = FltGetVolumeName(FltObjects->Volume, &VolumeName, &BufferSizeNeeded);
     if (NT_SUCCESS(status)) {
         wcscpy_s(pVolumeName, VolumeName.Length, VolumeName.Buffer);
     }

@@ -47,8 +47,8 @@ PortSendMessage(
     _Out_ PBOOLEAN Access
 )
 {
-    ULONG szResponse = sizeof(FILTER_REPLY_HEADER) + sizeof(PORT_RESPONSE);
-    //PPORT_RESPONSE pPortResponse = ExAllocatePoolWithTag(NonPagedPool, szResponse, 'vLIG');
+    ULONG SizeOfResponse = sizeof(FILTER_REPLY_HEADER) + sizeof(PORT_RESPONSE);
+    //PPORT_RESPONSE pPortResponse = ExAllocatePoolWithTag(NonPagedPool, SizeOfResponse, 'vLIG');
 
     //if (pPortResponse == NULL) return STATUS_UNSUCCESSFUL;
 
@@ -58,7 +58,7 @@ PortSendMessage(
         pPortRequest,
         sizeof(PORT_REQUEST),
         pPortRequest,
-        &szResponse,
+        &SizeOfResponse,
         NULL
     );
     *Access = ((PORT_RESPONSE *)pPortRequest)->Access;
