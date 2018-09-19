@@ -2,10 +2,16 @@
 #include <fltuser.h>
 #include <dontuse.h>
 #include <suppress.h>
+
+#include <list>
+#include <iomanip>
 #include <iostream>
 #include <string>
+#include <future>
+#include <thread>
 
 #include "../Common/Common.h"
+#include "Utils.h"
 
 #define CLIENT_DEFAULT_REQUEST_COUNT 4
 #define CLIENT_DEFAULT_THREAD_COUNT 4
@@ -14,6 +20,7 @@
 typedef struct _THREAD_CONTEXT {
     HANDLE hCommunicationPort;
     HANDLE hIoCompletionPort;
+    std::list<PWCHAR> arrFolderPath;
 } THREAD_CONTEXT, *PTHREAD_CONTEXT;
 
 typedef struct _FILTER_MESSAGE {
@@ -48,8 +55,6 @@ DWORD ClientWorker(
             hResult = HRESULT_FROM_WIN32(GetLastError());
             break;
         }
-
-        printf("\n\n------------------------------ \nPID: %p\nVolumeName: %ws\nFileName: %ws\n", pFilterMessage->Request.ProcessID, pFilterMessage->Request.VolumeName, pFilterMessage->Request.FilePath);
 
         PORT_RESPONSE Response;
         Response.Header.Status = 0;
@@ -86,7 +91,8 @@ int _cdecl main(
 {
     UNREFERENCED_PARAMETER(argc);
     UNREFERENCED_PARAMETER(argv);
-
+    
+    THREAD_CONTEXT ThreadContext;
     HANDLE hCommunicationPort;
     HRESULT hResult = FilterConnectCommunicationPort(
         PORT_NAME,
@@ -106,7 +112,6 @@ int _cdecl main(
         CLIENT_DEFAULT_THREAD_COUNT
     );
 
-    THREAD_CONTEXT ThreadContext;
     ThreadContext.hCommunicationPort = hCommunicationPort;
     ThreadContext.hIoCompletionPort = hIoCompletionPort;
 
@@ -159,10 +164,46 @@ int _cdecl main(
             }
         }
     }
-    WaitForMultipleObjectsEx(loop, hThread, TRUE, INFINITE, FALSE);
+    
+    int Command = TRUE;
+    while (Command) {
+        std::wcout << std::endl;
+        std::wcout << "================================================================================" << std::endl;
+        std::wcout << "|    GilRan Ransomware Solution v0.1a                                          |" << std::endl;
+        std::wcout << "================================================================================" << std::endl;
+        std::wcout << "|    [1] DMZ Folder -- SHOW                                                     |" << std::endl;
+        std::wcout << "|    [2] DMZ Folder --  ADD                                                     |" << std::endl;
+        std::wcout << "|    [0] Exit                                                                   |" << std::endl;
+        std::wcout << "================================================================================" << std::endl;
+        std::wcout << "Select: ";
+        
+        std::cin >> Command;
+        if (!std::cin) {
+            std::cin.clear();
+            std::cin.ignore(INT_MAX, '\n');
+            Command = TRUE;
+        }
+        
+        switch (Command) {
+            case 1:
+                for (auto FolderPath : ThreadContext.arrFolderPath) {
+                    std::wcout << FolderPath << std::endl;
+                }
+                break;
+            case 2:
+                PWCHAR Path = new WCHAR[MAX_PATH];
+
+                std::wcout << L"Input folder path to make DMZ Folder" << std::endl;
+                std::wcout << L">";
+                std::wcin >> Path;
+
+                ThreadContext.arrFolderPath.push_back(Path);
+                break;
+        }
+    }
 
     CloseHandle(hCommunicationPort);
     CloseHandle(hIoCompletionPort);
-
+    
     return S_OK;
 }
